@@ -21,7 +21,7 @@ $app->get('/tasks', function () use ($app) {
     return  $app->json($tasks);
 });
 
-$app->post('/tasks', function (Request $request) {
+$app->post('/tasks', function (Request $request) use ($app) {
     $name = $request->get('name');
     $desc = $request->get('description');
     $date = $request->get('date');
@@ -29,27 +29,27 @@ $app->post('/tasks', function (Request $request) {
     $response = ["name" => $name, "description" => $desc, "date" => $date];
 
     $sql = ("INSERT INTO tasks(name, description, date) VALUES(?, ?, ?)");
-    $app['db']->executeInsert($sql, array($name, $desc, $date));
+    $app['db']->executeQuery($sql, array($name, $desc, $date));
 
     return $app->json($response);
 });
 
-$app->delete('/tasks/{id}', function ($id) {
-    $sql = ("DELETE FROM tasks WHERE id = ?");
-    $app['db']->executeDelete($sql, array($id));
+$app->delete('/tasks/{id}', function ($id) use ($app){
+    $app['db']->delete('tasks', array('id' => $id));
 
     return $app->json($response);
 });
 
-$app->put('/tasks', function (Request $request) {
-    $name = $request->get('name');
+$app->put('/tasks/{id}', function ($id, Request $request) use ($app) {
+
+    $name = $request->get('title');
     $desc = $request->get('description');
     $date = $request->get('date');
 
     $response = ["name" => $name, "description" => $desc, "date" => $date];
 
-    $sql = ("INSERT INTO tasks(name, description, date) VALUES(?, ?, ?)");
-    $app['db']->executeInsert($sql, array($name, $desc, $date));
+    $sql = ("UPDATE tasks SET name = ?, description = ?, date = ? WHERE id = ?");
+    $app['db']->executeQuery($sql, array($name, $desc, $date, (int)$id));
 
     return $app->json($response);
 });
@@ -61,7 +61,7 @@ $app->get('/donetasks', function () use ($app) {
     return  $app->json($tasks);
 });
 
-$app->post('/donetasks', function (Request $request) {
+$app->post('/donetasks', function (Request $request) use ($app) {
     $name = $request->get('name');
     $desc = $request->get('description');
     $date = $request->get('date');
@@ -69,7 +69,7 @@ $app->post('/donetasks', function (Request $request) {
     $response = ["name" => $name, "description" => $desc, "date" => $date];
 
     $sql = ("INSERT INTO donetasks(name, description, date) VALUES(?, ?, ?)");
-    $app['db']->executeInsert($sql, array($name, $desc, $date));
+    $app['db']->executeQuery($sql, array($name, $desc, $date));
 
     return $app->json($response);
 });
